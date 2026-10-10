@@ -494,6 +494,12 @@ func (d Device) RequestConnectionParams(params ConnectionParams) error {
 	return nil
 }
 
+// ReadRSSI returns the signal strength of the connection in dBm.
+// Not yet implemented on this platform.
+func (d Device) ReadRSSI() (int16, error) {
+	return 0, errNotYetImplmented
+}
+
 // SetRandomAddress sets the random address to be used for advertising.
 func (a *Adapter) SetRandomAddress(mac MAC) error {
 	return errors.ErrUnsupported

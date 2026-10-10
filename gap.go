@@ -116,6 +116,8 @@ type GAPDevice interface {
 	// DiscoverServices returns ErrServiceNotFound if a requested service is not on the device.
 	DiscoverServices(uuids []UUID) ([]DeviceService, error)
 	RequestConnectionParams(params ConnectionParams) error
+	// ReadRSSI returns the signal strength of the connection in dBm.
+	ReadRSSI() (int16, error)
 	Connected() (bool, error)
 	Disconnect() error
 }

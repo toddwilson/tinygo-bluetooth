@@ -100,8 +100,15 @@ type deviceInternal struct {
 
 	servicesChan chan error
 	charsChan    chan error
+	rssiChan     chan rssiResult
 
 	services map[UUID]DeviceService
+}
+
+// rssiResult is the value passed to DidReadRSSI.
+type rssiResult struct {
+	rssi int16
+	err  error
 }
 
 // Connect starts a connection attempt to the given peripheral device address.
@@ -147,6 +154,7 @@ func (a *Adapter) Connect(address Address, params ConnectionParams) (Device, err
 					prph:         p,
 					servicesChan: make(chan error),
 					charsChan:    make(chan error),
+					rssiChan:     make(chan rssiResult, 1),
 				},
 			}
 
@@ -195,6 +203,25 @@ func (d Device) RequestConnectionParams(params ConnectionParams) error {
 	return nil
 }
 
+// ReadRSSI returns the signal strength of the connection in dBm.
+// It blocks until CoreBluetooth calls DidReadRSSI or the request times out.
+func (d Device) ReadRSSI() (int16, error) {
+	// Drop a result from an earlier request that timed out.
+	select {
+	case <-d.rssiChan:
+	default:
+	}
+
+	d.prph.ReadRSSI()
+
+	select {
+	case result := <-d.rssiChan:
+		return result.rssi, result.err
+	case <-time.After(defaultConnectionTimeout):
+		return 0, errors.New("timeout on ReadRSSI")
+	}
+}
+
 // Peripheral delegate functions
 
 type peripheralDelegate struct {
@@ -207,6 +234,16 @@ type peripheralDelegate struct {
 // have been discovered.
 func (pd *peripheralDelegate) DidDiscoverServices(prph cbgo.Peripheral, err error) {
 	pd.d.servicesChan <- nil
+}
+
+// DidReadRSSI is called when the RSSI requested by ReadRSSI is available.
+// https://developer.apple.com/documentation/corebluetooth/cbperipheraldelegate/peripheral(_:didreadrssi:error:)
+func (pd *peripheralDelegate) DidReadRSSI(prph cbgo.Peripheral, rssi int, err error) {
+	// Drop the result if ReadRSSI timed out, so the delegate never blocks.
+	select {
+	case pd.d.rssiChan <- rssiResult{rssi: int16(rssi), err: err}:
+	default:
+	}
 }
 
 // DidDiscoverCharacteristics is called when the characteristics for a Service

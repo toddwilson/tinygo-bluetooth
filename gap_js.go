@@ -225,3 +225,9 @@ func (d Device) Connected() (bool, error) {
 func (d Device) RequestConnectionParams(params ConnectionParams) error {
 	return nil
 }
+
+// ReadRSSI returns the signal strength of the connection in dBm.
+// WebBluetooth does not expose this, so it is not supported.
+func (d Device) ReadRSSI() (int16, error) {
+	return 0, errNotSupported
+}

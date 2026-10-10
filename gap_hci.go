@@ -314,6 +314,12 @@ func (d Device) RequestConnectionParams(params ConnectionParams) error {
 	return nil
 }
 
+// ReadRSSI returns the signal strength of the connection in dBm.
+// Not yet implemented on this platform.
+func (d Device) ReadRSSI() (int16, error) {
+	return 0, errNotYetImplmented
+}
+
 func (d Device) findNotificationRegistration(handle uint16) *notificationRegistration {
 	for _, n := range d.notificationRegistrations {
 		if n.handle == handle {

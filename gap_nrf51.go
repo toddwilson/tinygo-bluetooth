@@ -131,6 +131,12 @@ func (d Device) RequestConnectionParams(params ConnectionParams) error {
 	return errNotYetImplmented
 }
 
+// ReadRSSI returns the signal strength of the connection in dBm.
+// Not yet implemented on the nrf51.
+func (d Device) ReadRSSI() (int16, error) {
+	return 0, errNotYetImplmented
+}
+
 // Connected returns whether the device is currently connected.
 //
 // Not yet implemented on the nrf51.

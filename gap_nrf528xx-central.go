@@ -239,6 +239,12 @@ func (d Device) RequestConnectionParams(params ConnectionParams) error {
 	return makeError(errCode)
 }
 
+// ReadRSSI returns the signal strength of the connection in dBm.
+// Not yet implemented on the SoftDevice.
+func (d Device) ReadRSSI() (int16, error) {
+	return 0, errNotYetImplmented
+}
+
 func (d Device) Connected() (bool, error) {
 	return false, errNotYetImplmented
 }

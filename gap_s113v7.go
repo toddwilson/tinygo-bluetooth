@@ -31,6 +31,12 @@ func (d Device) RequestConnectionParams(params ConnectionParams) error {
 	return errNotSupported
 }
 
+// ReadRSSI returns the signal strength of the connection in dBm.
+// s113v7 is a peripheral-only device, so this is not supported.
+func (d Device) ReadRSSI() (int16, error) {
+	return 0, errNotSupported
+}
+
 // Connected returns whether the device is currently connected.
 //
 // s113v7 is a peripheral-only device, so this is not supported.
